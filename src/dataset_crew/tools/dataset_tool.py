@@ -53,6 +53,25 @@ class DatasetTool(BaseTool):
             A JSON string containing the result of the operation
         """
         try:
+            # Create output directory if it doesn't exist
+            output_dir = os.path.join(os.getcwd(), "output")
+            os.makedirs(output_dir, exist_ok=True)
+
+            # Normalize and validate file path
+            if file_path == "path_to_your_dataset.csv" or not file_path.endswith(
+                ".csv"
+            ):
+                # Use a default file path based on language if provided
+                if language:
+                    file_name = f"{language.lower()}_dataset.csv"
+                else:
+                    file_name = "dataset.csv"
+                file_path = os.path.join(output_dir, file_name)
+            elif not os.path.isabs(file_path):
+                # If it's a relative path but not in the output directory, put it there
+                if not file_path.startswith(output_dir):
+                    file_path = os.path.join(output_dir, os.path.basename(file_path))
+
             if action == "create":
                 return self._create_dataset(file_path, language)
             elif action == "append":

@@ -1,7 +1,15 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai.tools import SerperDevTool
+from crewai_tools import (
+    SerperDevTool,
+    PDFSearchTool,
+    ScrapeWebsiteTool,
+    WebsiteSearchTool,
+    FileReadTool,
+    DirectoryReadTool,
+)
 from dataset_crew.tools.dataset_tool import DatasetTool
+from dataset_crew.tools.custom_tool import PDFReaderTool
 
 # If you want to run a snippet of code before or after the crew starts,
 # you can use the @before_kickoff and @after_kickoff decorators
@@ -25,7 +33,10 @@ class DatasetCrew:
     def researcher(self) -> Agent:
         return Agent(
             config=self.agents_config["researcher"],
-            tools=[SerperDevTool()],
+            tools=[
+                SerperDevTool(),
+                WebsiteSearchTool(),
+            ],
             verbose=True,
         )
 
@@ -33,7 +44,16 @@ class DatasetCrew:
     def text_extractor(self) -> Agent:
         return Agent(
             config=self.agents_config["text_extractor"],
-            tools=[SerperDevTool(), DatasetTool()],
+            tools=[
+                SerperDevTool(),
+                DatasetTool(),
+                PDFSearchTool(),
+                ScrapeWebsiteTool(),
+                FileReadTool(),
+                DirectoryReadTool(),
+                # Keep the custom PDFReaderTool as a fallback
+                PDFReaderTool(),
+            ],
             verbose=True,
         )
 
