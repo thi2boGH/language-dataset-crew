@@ -1,6 +1,6 @@
 planning_task:
   description: >
-    Create a detailed plan for collecting {language} text data for training a glirel model.
+    Create a detailed plan for collecting {language} text data for training a language model.
     If a specific domain ({domain}) is provided, focus on that domain.
     Define the types of text that would be most valuable (business reports, government documents, 
     technical papers, emails, etc.), the criteria for selection, and guidelines for the researcher
@@ -18,7 +18,11 @@ research_task:
   description: >
     Based on the project manager's plan, find diverse and high-quality sources of {language} text
     on the web. If a specific domain ({domain}) is specified, focus on that domain.
-    Use the SerperDev search tool to find relevant web pages containing {language} text.
+    
+    Use the following tools to find relevant content:
+    1. SerperDev search tool to find relevant web pages containing {language} text
+    2. WebsiteSearchTool to search within specific websites for relevant content
+    
     For each source, provide:
     1. The URL
     2. A brief description of the content
@@ -34,16 +38,25 @@ extraction_task:
   description: >
     Extract clean, well-formatted text from the sources identified by the researcher.
     Follow the guidelines provided by the project manager to ensure the text meets
-    the quality criteria. For each source:
-    1. Use the SerperDev tool to access the web page content
-    2. Extract the most valuable text content from the page
-    3. Clean and format the text by removing ads, navigation elements, and irrelevant content
-    4. Ensure the text is properly formatted and representative of the language
-    5. Save the extracted text to the dataset CSV file with appropriate metadata
+    the quality criteria. 
+    
+    Use the following tools based on the source type:
+    1. For web pages: Use the ScrapeWebsiteTool to extract the main content
+    2. For PDF files: Use the PDFSearchTool or PDFReaderTool to extract text content
+       (PDFReaderTool will automatically limit extraction to the first 10 pages for large PDFs)
+    3. For managing the dataset: Use the DatasetTool, FileReadTool, and DirectoryReadTool
+    
+    For each source:
+    1. Extract the most valuable text content from the page
+    2. Clean and format the text by removing ads, navigation elements, and irrelevant content
+    3. Ensure the text is properly formatted and representative of the language
+    4. Save the extracted text to the dataset CSV file with appropriate metadata
     
     When extracting text, focus on the main content of the page and ignore boilerplate text,
     navigation elements, ads, and other non-essential content. The goal is to extract clean,
     well-formatted text that would be valuable for training a language model.
+    
+    The output will be saved to an 'output' directory in the project root as '{language}_dataset.csv'.
   expected_output: >
     A CSV file containing the extracted text data with the following columns:
     1. text: The extracted text content
@@ -51,6 +64,8 @@ extraction_task:
     3. date_extracted: The date when the text was extracted
     4. domain: The domain or category of the text (e.g., government, business, technical)
     5. language: The language of the text
+    
+    The file will be saved to the 'output' directory as '{language}_dataset.csv'.
   agent: text_extractor
   dependencies: [research_task]
   output_file: "{language}_dataset.csv"

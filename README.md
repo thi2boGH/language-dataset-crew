@@ -4,79 +4,113 @@
 [![CrewAI](https://img.shields.io/badge/CrewAI-0.102.0-green.svg)](https://crewai.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A CrewAI-powered tool to collect high-quality text data in specific languages for training glirel models or other NLP applications.
+A CrewAI-powered tool to collect language-specific text data for training language models.
 
-## 🌟 Features
+## Overview
 
-- **Multi-language Support**: Collect text data in any language
-- **Domain Specific**: Optionally focus on specific domains (business, government, technical, etc.)
-- **Intelligent Extraction**: Uses LLMs to extract clean, relevant text from web sources
-- **Structured Output**: Saves data to CSV with metadata for easy processing
+This project uses CrewAI to create a crew of AI agents that work together to collect high-quality text data in various languages. The crew consists of:
 
-## 🤖 How It Works
+1. **Project Manager**: Coordinates the collection effort and defines quality criteria
+2. **Researcher**: Finds diverse and high-quality text sources on the web
+3. **Text Extractor**: Extracts and cleans text from the sources for inclusion in the dataset
 
-This crew helps you gather language-specific text data from the web through three specialized AI agents:
+## Features
 
-1. **Planning**: The Project Manager agent creates a detailed plan for collecting text data in your target language, defining quality criteria and guidelines.
-2. **Research**: The Researcher agent finds diverse and high-quality sources of text in your target language using Serper.dev, optionally focusing on a specific domain.
-3. **Extraction**: The Text Extractor agent extracts clean, well-formatted text from the sources and saves it to a CSV file with metadata.
+- Collect text data in any language
+- Focus on specific domains (government, business, technical, etc.)
+- Extract text from various web sources including PDFs
+- Automatic PDF page limiting (first 10 pages) to handle large documents
+- Clean and format text for language model training
+- Save data to CSV files with appropriate metadata
 
-The resulting dataset can be used to train language-specific glirel models or other NLP applications.
-
-## 🛠️ Installation
-
-### Prerequisites
-
-- Python 3.10 or higher
-- API keys for OpenAI and Serper.dev
-
-### Setup
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/language-dataset-crew.git
-   cd language-dataset-crew
-   ```
-
-2. Install the package:
-   ```bash
-   pip install -e .
-   ```
-
-3. Create a `.env` file with your API keys:
-   ```
-   OPENAI_API_KEY=your_openai_api_key_here
-   SERPER_API_KEY=your_serper_api_key_here
-   ```
-
-## 🚀 Usage
-
-Run the crew with the following command:
+## Installation
 
 ```bash
-crewai run --language French --domain business
+# Clone the repository
+git clone https://github.com/yourusername/language-dataset-crew.git
+cd language-dataset-crew
+
+# Install the package
+pip install -e .
 ```
 
-### Command Line Arguments
+## Configuration
 
-- `--language`: The target language for text collection (default: "English")
-- `--domain`: Optional domain to focus on, e.g., "government", "business", "technical" (default: None)
+Create a `.env` file in the root directory with your API keys:
 
-## 📊 Output
+```
+MODEL=gpt-4o-mini  # or another OpenAI model
+OPENAI_API_KEY=your_openai_api_key
+SERPER_API_KEY=your_serper_api_key
+```
 
-The crew will generate a CSV file named `{language}_dataset.csv` containing the extracted text data with the following columns:
+You can copy the `.env.example` file and fill in your API keys.
 
-1. `text`: The extracted text content
-2. `source_url`: The URL where the text was found
-3. `date_extracted`: The date when the text was extracted
-4. `domain`: The domain or category of the text
-5. `language`: The language of the text
+## Usage
 
-## 📝 Example
+Run the crew using the CrewAI CLI:
 
-See the [EXAMPLE_README.md](EXAMPLE_README.md) for a detailed example of how to use this tool.
+```bash
+# Collect English text data
+crewai run --crew dataset_crew.crew:DatasetCrew --language English
 
-## 📄 License
+# Collect French text data with a focus on government documents
+crewai run --crew dataset_crew.crew:DatasetCrew --language French --domain government
+```
+
+The collected data will be saved to the `output` directory in CSV format:
+- `output/english_dataset.csv`
+- `output/french_dataset.csv`
+- etc.
+
+## Tools
+
+The crew uses several powerful tools to collect and process text data:
+
+### Search Tools
+- **SerperDevTool**: Used to search the web for relevant content
+- **WebsiteSearchTool**: Specialized tool for searching within specific websites
+
+### Content Extraction Tools
+- **ScrapeWebsiteTool**: Extracts content from web pages with high accuracy
+- **PDFSearchTool**: Specialized tool for extracting and searching text in PDF documents
+- **PDFReaderTool**: Custom tool for PDF text extraction that automatically limits extraction to the first 10 pages of large PDFs
+
+### Data Management Tools
+- **DatasetTool**: Custom tool for managing the dataset CSV files
+- **FileReadTool**: Reads and processes various file formats
+- **DirectoryReadTool**: Manages directory structures and file organization
+
+## Troubleshooting
+
+### Common Issues
+
+1. **PDF Text Extraction**: If you encounter issues with PDF text extraction, try using the PDFSearchTool first, which is more robust. The custom PDFReaderTool is available as a fallback and will automatically limit extraction to the first 10 pages for large PDFs.
+
+2. **Dataset Tool Path Issues**: If you encounter issues with the Dataset Management Tool, make sure you're using a valid file path. The tool now automatically normalizes file paths and uses default values when needed.
+
+3. **Missing Dependencies**: If you get import errors, make sure you've installed all the required dependencies with `pip install -e .`
+
+## Advanced Usage
+
+CrewAI provides additional CLI commands for working with your crew:
+
+```bash
+# Train your crew (useful for fine-tuning)
+crewai train --crew dataset_crew.crew:DatasetCrew --n-iterations 5 --filename training_results.json --language Spanish
+
+# Replay a specific task execution
+crewai replay --crew dataset_crew.crew:DatasetCrew --task-id extraction_task
+
+# Test your crew with different models
+crewai test --crew dataset_crew.crew:DatasetCrew --n-iterations 3 --model gpt-4o --language German
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
