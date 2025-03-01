@@ -1,0 +1,56 @@
+planning_task:
+  description: >
+    Create a detailed plan for collecting {language} text data for training a glirel model.
+    If a specific domain ({domain}) is provided, focus on that domain.
+    Define the types of text that would be most valuable (business reports, government documents, 
+    technical papers, emails, etc.), the criteria for selection, and guidelines for the researcher
+    and text extractor to follow.
+  expected_output: >
+    A detailed plan outlining the data collection strategy, including:
+    1. Types of text to prioritize
+    2. Quality criteria for selection
+    3. Specific guidelines for the researcher and text extractor
+    4. Target amount of text to collect
+    5. Any specific considerations for {language} text
+  agent: project_manager
+
+research_task:
+  description: >
+    Based on the project manager's plan, find diverse and high-quality sources of {language} text
+    on the web. If a specific domain ({domain}) is specified, focus on that domain.
+    Use the SerperDev search tool to find relevant web pages containing {language} text.
+    For each source, provide:
+    1. The URL
+    2. A brief description of the content
+    3. Why it's valuable for the dataset
+    4. An estimate of the amount of text available
+  expected_output: >
+    A list of at least 10 high-quality sources of {language} text, with detailed information
+    about each source as specified in the description.
+  agent: researcher
+  dependencies: [planning_task]
+
+extraction_task:
+  description: >
+    Extract clean, well-formatted text from the sources identified by the researcher.
+    Follow the guidelines provided by the project manager to ensure the text meets
+    the quality criteria. For each source:
+    1. Use the SerperDev tool to access the web page content
+    2. Extract the most valuable text content from the page
+    3. Clean and format the text by removing ads, navigation elements, and irrelevant content
+    4. Ensure the text is properly formatted and representative of the language
+    5. Save the extracted text to the dataset CSV file with appropriate metadata
+    
+    When extracting text, focus on the main content of the page and ignore boilerplate text,
+    navigation elements, ads, and other non-essential content. The goal is to extract clean,
+    well-formatted text that would be valuable for training a language model.
+  expected_output: >
+    A CSV file containing the extracted text data with the following columns:
+    1. text: The extracted text content
+    2. source_url: The URL where the text was found
+    3. date_extracted: The date when the text was extracted
+    4. domain: The domain or category of the text (e.g., government, business, technical)
+    5. language: The language of the text
+  agent: text_extractor
+  dependencies: [research_task]
+  output_file: "{language}_dataset.csv"
