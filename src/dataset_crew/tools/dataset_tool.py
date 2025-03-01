@@ -58,9 +58,7 @@ class DatasetTool(BaseTool):
             os.makedirs(output_dir, exist_ok=True)
 
             # Normalize and validate file path
-            if file_path == "path_to_your_dataset.csv" or not file_path.endswith(
-                ".csv"
-            ):
+            if not file_path or not file_path.endswith(".csv"):
                 # Use a default file path based on language if provided
                 if language:
                     file_name = f"{language.lower()}_dataset.csv"
